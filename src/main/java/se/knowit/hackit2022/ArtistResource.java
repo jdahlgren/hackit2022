@@ -1,4 +1,4 @@
-package org.acme;
+package se.knowit.hackit2022;
 
 import java.util.List;
 import javax.inject.Inject;
@@ -8,10 +8,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.acme.dto.ArtistRequest;
-import org.acme.dto.ArtistResponse;
-import org.acme.dto.SongRequest;
-import org.acme.service.ArtistService;
+import se.knowit.hackit2022.dto.ArtistRequest;
+import se.knowit.hackit2022.dto.ArtistResponse;
+import se.knowit.hackit2022.dto.SongRequest;
+import se.knowit.hackit2022.service.ArtistService;
 import org.jboss.resteasy.reactive.RestPath;
 
 @Path("/artists")

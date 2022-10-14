@@ -1,4 +1,4 @@
-package org.acme;
+package se.knowit.hackit2022;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
