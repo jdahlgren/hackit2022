@@ -41,10 +41,8 @@ public class ArtistResource {
 
     @Path("/{artistId}/songs")
     @POST
-    public String artistsSongs(@RestPath long artistId, SongRequest song) {
+    public ArtistResponse artistsSongs(@RestPath long artistId, SongRequest song) {
         return artistService.storeSong(artistId, song);
     }
-
-
 
 }
