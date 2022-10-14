@@ -1,5 +1,6 @@
 package org.acme;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -7,42 +8,41 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import org.acme.model.Artist;
+import org.acme.dto.ArtistRequest;
+import org.acme.dto.ArtistResponse;
+import org.acme.dto.SongRequest;
 import org.acme.service.ArtistService;
 import org.jboss.resteasy.reactive.RestPath;
 
 @Path("/artists")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class ArtistResource {
 
     @Inject
     ArtistService artistService;
 
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String artists() {
-        return "All artists";
+    public List<ArtistResponse> artists() {
+        return artistService.getAllArtists();
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String artists(Artist artist) {
-        Artist storedArtist = artistService.storeArtist(artist);
-        return storedArtist.id() + storedArtist.name();
+    public ArtistResponse artists(ArtistRequest artist) {
+        return artistService.storeArtist(artist);
     }
 
-    @Path("/{name}")
+
+    @Path("/{id:\\d+}")
     @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String artist(@RestPath String name) {
-        return name;
+    public ArtistResponse artistById(@RestPath long id) {
+        return artistService.getArtistById(id);
     }
 
-    @Path("/{name}/songs")
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String artistsSongs(@RestPath String name) {
-        return "All songs by " + name;
+    @Path("/{artistId}/songs")
+    @POST
+    public String artistsSongs(@RestPath long artistId, SongRequest song) {
+        return artistService.storeSong(artistId, song);
     }
 
 

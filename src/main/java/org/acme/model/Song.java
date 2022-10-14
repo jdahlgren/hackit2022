@@ -1,5 +1,9 @@
 package org.acme.model;
 
-public record Song(Long id, String name) {
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
+public class Song extends PanacheEntity {
+
+  public String name;
 
 }
