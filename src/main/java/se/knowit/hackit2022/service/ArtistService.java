@@ -1,5 +1,6 @@
 package se.knowit.hackit2022.service;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import java.util.List;
 import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
@@ -17,46 +18,46 @@ public class ArtistService {
 
   @Transactional
   public ArtistResponse storeArtist(ArtistRequest artistRequest) {
-    Artist artist = new Artist();
-    artist.setName(artistRequest.name());
+    Artist artist = new Artist(artistRequest.name());
     artist.persist();
 
     return mapToArtistResponse(artist);
   }
 
   public List<ArtistResponse> getAllArtists() {
-    List<Artist> panacheEntityBases = Artist.listAll();
-
-    return panacheEntityBases.stream()
-        .map(ArtistService::mapToArtistResponse)
+    return Artist.listAll().stream()
+        .map(Artist.class::cast)
+        .map(this::mapToArtistResponse)
         .toList();
   }
 
   public ArtistResponse getArtistById(long id) {
-    Optional<Artist> artistOptional = Artist.findByIdOptional(id);
-    Artist artist = artistOptional.orElseThrow(() -> new NotFoundException("Could not find " + id));
-    return mapToArtistResponse(artist);
+    return Artist.findByIdOptional(id)
+        .map(Artist.class::cast)
+        .map(this::mapToArtistResponse)
+        .orElseThrow(() -> new NotFoundException("Could not find " + id));
   }
 
+  @Transactional
   public ArtistResponse storeSong(long artistId, SongRequest songRequest) {
-    Optional<Artist> artistOptional = Artist.findByIdOptional(artistId);
-    Artist artist = artistOptional.orElseThrow(() -> new NotFoundException("Could not find " + artistId));
-    Song song = new Song();
-    song.setName(songRequest.name());
-    song.setArtist(artist);
+    Artist artist = Artist.findByIdOptional(artistId)
+        .map(Artist.class::cast)
+        .orElseThrow(() -> new NotFoundException("Could not find " + artistId));
+
+    Song song = new Song(songRequest.name(), artist);
     song.persist();
 
-    artist.getSongs().add(song);
+    artist.addSong(song);
 
     return mapToArtistResponse(artist);
   }
 
-  private static ArtistResponse mapToArtistResponse(Artist artist) {
+  private ArtistResponse mapToArtistResponse(Artist artist) {
     List<SongResponse> songResponses = mapToSongResponse(artist.getSongs());
     return new ArtistResponse(artist.getId(), artist.getName(), songResponses);
   }
 
-  private static List<SongResponse> mapToSongResponse(List<Song> songs) {
+  private List<SongResponse> mapToSongResponse(List<Song> songs) {
     return songs.stream()
         .map(song -> new SongResponse(song.getId(), song.getName()))
         .toList();

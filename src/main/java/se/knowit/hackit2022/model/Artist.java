@@ -10,6 +10,14 @@ import javax.persistence.OneToMany;
 @Entity
 public class Artist extends PanacheEntity {
 
+  public Artist() {
+
+  }
+
+  public Artist(String name) {
+    this.name = name;
+  }
+
   private String name;
 
   @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
@@ -23,12 +31,12 @@ public class Artist extends PanacheEntity {
     return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public List<Song> getSongs() {
+    return List.copyOf(songs);
   }
 
-  public List<Song> getSongs() {
-    return songs;
+  public void addSong(Song song) {
+    songs.add(song);
   }
 
 

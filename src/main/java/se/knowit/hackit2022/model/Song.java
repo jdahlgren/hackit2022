@@ -12,22 +12,23 @@ public class Song extends PanacheEntity {
   @ManyToOne(cascade = CascadeType.ALL)
   private Artist artist;
 
+  public Song(String name, Artist artist) {
+    this.name = name;
+    this.artist = artist;
+  }
+
+  public Song() {
+
+  }
+
   public long getId() {
     return id;
   }
   public String getName() {
     return name;
   }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public Artist getArtist() {
     return artist;
   }
 
-  public void setArtist(Artist artist) {
-    this.artist = artist;
-  }
 }
