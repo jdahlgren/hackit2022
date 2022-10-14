@@ -8,8 +8,26 @@ import javax.persistence.ManyToOne;
 @Entity
 public class Song extends PanacheEntity {
 
-  public String name;
+  private String name;
   @ManyToOne(cascade = CascadeType.ALL)
-  public Artist artist;
+  private Artist artist;
 
+  public long getId() {
+    return id;
+  }
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public Artist getArtist() {
+    return artist;
+  }
+
+  public void setArtist(Artist artist) {
+    this.artist = artist;
+  }
 }

@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
-import org.jetbrains.annotations.NotNull;
 import se.knowit.hackit2022.dto.ArtistRequest;
 import se.knowit.hackit2022.dto.ArtistResponse;
 import se.knowit.hackit2022.dto.SongRequest;
@@ -19,43 +18,47 @@ public class ArtistService {
   @Transactional
   public ArtistResponse storeArtist(ArtistRequest artistRequest) {
     Artist artist = new Artist();
-    artist.name = artistRequest.name();
-
+    artist.setName(artistRequest.name());
     artist.persist();
-    return new ArtistResponse(artist.id, artist.name, mapToSongResponse(artist));
+
+    return mapToArtistResponse(artist);
   }
 
   public List<ArtistResponse> getAllArtists() {
     List<Artist> panacheEntityBases = Artist.listAll();
 
-    return panacheEntityBases.stream().map(a -> new ArtistResponse(a.id, a.name, mapToSongResponse(a)))
+    return panacheEntityBases.stream()
+        .map(ArtistService::mapToArtistResponse)
         .toList();
   }
 
   public ArtistResponse getArtistById(long id) {
     Optional<Artist> artistOptional = Artist.findByIdOptional(id);
     Artist artist = artistOptional.orElseThrow(() -> new NotFoundException("Could not find " + id));
-    List<SongResponse> songResponses = mapToSongResponse(artist);
-    return new ArtistResponse(artist.id, artist.name, songResponses);
+    return mapToArtistResponse(artist);
   }
 
-  @Transactional
   public ArtistResponse storeSong(long artistId, SongRequest songRequest) {
     Optional<Artist> artistOptional = Artist.findByIdOptional(artistId);
     Artist artist = artistOptional.orElseThrow(() -> new NotFoundException("Could not find " + artistId));
     Song song = new Song();
-    song.name = songRequest.name();
-    song.artist = artist;
+    song.setName(songRequest.name());
+    song.setArtist(artist);
     song.persist();
 
-    artist.songs.add(song);
+    artist.getSongs().add(song);
 
-    List<SongResponse> songResponses = mapToSongResponse(artist);
-    return new ArtistResponse(artist.id, artist.name, songResponses);
+    return mapToArtistResponse(artist);
   }
 
-  @NotNull
-  private static List<SongResponse> mapToSongResponse(Artist artist) {
-    return artist.songs.stream().map(s -> new SongResponse(s.id, s.name)).toList();
+  private static ArtistResponse mapToArtistResponse(Artist artist) {
+    List<SongResponse> songResponses = mapToSongResponse(artist.getSongs());
+    return new ArtistResponse(artist.getId(), artist.getName(), songResponses);
+  }
+
+  private static List<SongResponse> mapToSongResponse(List<Song> songs) {
+    return songs.stream()
+        .map(song -> new SongResponse(song.getId(), song.getName()))
+        .toList();
   }
 }

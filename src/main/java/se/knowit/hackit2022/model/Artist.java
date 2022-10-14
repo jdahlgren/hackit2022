@@ -10,9 +10,26 @@ import javax.persistence.OneToMany;
 @Entity
 public class Artist extends PanacheEntity {
 
-  public String name;
+  private String name;
 
   @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
-  public List<Song> songs = new ArrayList<>();
+  private final List<Song> songs = new ArrayList<>();
+
+  public String getName() {
+    return name;
+  }
+
+  public long getId() {
+    return id;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public List<Song> getSongs() {
+    return songs;
+  }
+
 
 }
