@@ -1,8 +1,6 @@
 package se.knowit.hackit2022.service;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import java.util.List;
-import java.util.Optional;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
