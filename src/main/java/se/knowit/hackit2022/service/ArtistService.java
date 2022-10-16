@@ -4,22 +4,49 @@ import java.util.List;
 import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import se.knowit.hackit2022.dto.ArtistRequest;
 import se.knowit.hackit2022.dto.ArtistResponse;
 import se.knowit.hackit2022.dto.SongRequest;
 import se.knowit.hackit2022.dto.SongResponse;
 import se.knowit.hackit2022.model.Artist;
 import se.knowit.hackit2022.model.Song;
+import se.knowit.hackit2022.model.TopSongsResponse;
 
 @ApplicationScoped
 public class ArtistService {
 
+  @RestClient
+  LastFmService lastFmService;
+
   @Transactional
   public ArtistResponse storeArtist(ArtistRequest artistRequest) {
     Artist artist = new Artist(artistRequest.name());
+
+    MultivaluedMap<String, String> queryParams = getQueryParams(artistRequest);
+
+    TopSongsResponse topSongsResponse = lastFmService.getTopSongsForArtist(queryParams);
+    if (topSongsResponse != null) {
+      topSongsResponse.toptracks().track().forEach(
+              track -> artist.addSong(new Song(track.name(), artist))
+      );
+    }
+
     artist.persist();
 
     return mapToArtistResponse(artist);
+  }
+
+  private static MultivaluedMap<String, String> getQueryParams(ArtistRequest artistRequest) {
+    MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>();
+    queryParams.add("method", "artist.gettoptracks");
+    queryParams.add("artist", artistRequest.name());
+    queryParams.add("api_key", "770966cf75acda6b1712e4d5de8693a6");
+    queryParams.add("format", "json");
+    return queryParams;
   }
 
   public List<ArtistResponse> getAllArtists() {
